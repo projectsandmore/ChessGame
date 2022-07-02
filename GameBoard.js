@@ -13,7 +13,21 @@ class GameBoard {
             ["rook",[[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],
             [-1,0],[-2,0],[-3,0],[-4,0],[-5,0],[-6,0],[-7,0],
             [0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],
-                [0,-1],[0,-2],[0,-3],[0,-4],[0,-5],[0,-6],[0,-7]]]
+                [0,-1],[0,-2],[0,-3],[0,-4],[0,-5],[0,-6],[0,-7]]],
+            ["bishop",[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],
+            [1,-1],[2,-2],[3,-3],[4,-4],[5,-5],[6,-6],[7,-7],
+                [-1,-1],[-2,-2],[-3,-3],[-4,-4],[-5,-5],[-6,-6],[-7,-7],
+                [-1,1],[-2,2],[-3,3],[-4,4],[-5,5],[-6,6],[-7,7]]],
+            ["queen",[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7],
+                [1,-1],[2,-2],[3,-3],[4,-4],[5,-5],[6,-6],[7,-7],
+                [-1,-1],[-2,-2],[-3,-3],[-4,-4],[-5,-5],[-6,-6],[-7,-7],
+                [-1,1],[-2,2],[-3,3],[-4,4],[-5,5],[-6,6],[-7,7],
+                [1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],
+                [-1,0],[-2,0],[-3,0],[-4,0],[-5,0],[-6,0],[-7,0],
+                [0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],
+                [0,-1],[0,-2],[0,-3],[0,-4],[0,-5],[0,-6],[0,-7]
+            ]],
+            ["king",[[1,0],[-1,0],[0,1],[0,-1]]]
         ]
 
 
@@ -29,7 +43,9 @@ class GameBoard {
             var xpos = this.selectedPiece[0];
             var ypos = this.selectedPiece[1];
             //Check for empty board
-            if(this.board[this.hover[1]][this.hover[0]] == false){
+            if((this.board[this.hover[1]][this.hover[0]] == false && this.isFound2d(this.PieceHint, this.hover) == true) ||
+                (this.board[this.hover[1]][this.hover[0][1]] != this.Turn && this.isFound2d(this.PieceHint, this.hover) == true)
+            ){
 
                 this.board[this.hover[1]][this.hover[0]] = [this.board[ypos][xpos][0],player]
                 this.board[ypos][xpos] = false;
@@ -43,6 +59,7 @@ class GameBoard {
                 }
                 console.log(this.Turn)
             }
+                this.PieceHint = [[]];
         }
 
     }
@@ -68,23 +85,86 @@ class GameBoard {
 
     }
 
+
+    isFound(array, ele){
+        for(var i=0; i<array.length; i++){
+            if(array[i] == ele){
+                return(true);
+            }
+        }
+        return(false);
+
+
+    }
+
+    isFound2d(array, ele){
+        for(var i=0; i<array.length; i++){
+            if(array[i][0] == ele[0] && array[i][1] == ele[1]){
+                return(true);
+            }
+        }
+        return(false);
+
+
+    }
+
     DisplayHint(pieceName,Position){
         var displayHints = [];
-        console.log(pieceName)
+
         for(var mov of this.Moves){
-            console.log(mov[0])
             if(mov[0] == pieceName){
                 var moves_ = mov[1];
                 var posX, posY;
-                for(var moveHint of moves_){
+                var obstaclesReach = [];
+                for(var moveHints of moves_){
+                    let moveHint = [...moveHints];
+                    if(this.Turn == "black"){
+                        moveHint[1] = -moveHint[1]
+                    }
+                    console.log(moveHint[1],this.Turn)
                     posX = Position[0] + moveHint[0];
                     posY = Position[1] + moveHint[1];
+
+                    var Direction = "";
+                    if(moveHint[0] > 0){
+                        Direction += "R"
+                    }
+                    if(moveHint[0] < 0){
+                        Direction += "L"
+                    }
+                    if(moveHint[1] > 0){
+                        Direction += "D"
+                    }
+                    if(moveHint[1] < 0){
+                        Direction += "U"
+                    }
+
+
                     console.log(posX,posY)
                     if(posX >= 0 && posX <= 7 && posY >= 0 && posY <= 7) {
-                        console.log(1234)
-                        if (this.board[posY][posX] == false) {
+
+                        if (pieceName != "pawn" && this.board[posY][posX][1] != this.Turn && this.isFound(obstaclesReach,Direction) == false &&
+                            this.board[posY][posX] != false){
+                            displayHints.push([posX,posY]);
+                            obstaclesReach.push(Direction);
+                        }
+
+                        if(pieceName == "pawn"){
+                            if(this.board[posY][posX+1][1] != this.Turn && this.board[posY][posX+1] != false){
+                                displayHints.push([posX+1,posY]);
+                            }
+                            if(this.board[posY][posX-1][1] != this.Turn && this.board[posY][posX-1] != false){
+                                displayHints.push([posX-1,posY]);
+                            }
+
+                        }
+
+
+                        if (this.board[posY][posX] == false && this.isFound(obstaclesReach,Direction) == false) {
                             displayHints.push([posX,posY]);
                         } else {
+                            console.log(1234)
+                            obstaclesReach.push(Direction);
                             this.PieceHint = displayHints;
                         }
                     }else{
