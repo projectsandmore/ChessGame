@@ -3,7 +3,7 @@
 class Draw{
     constructor(context, GameBoard) {
         this.board = new Image();
-        this.board.src = "https://projectsandmore.github.io/ChessGame/gameImages/board.png";
+        this.board.src = "https://github.com/projectsandmore/ChessGame/tree/master/gameImages/board.png";
 
         this.piecies = ["pawn","rook","knight","bishop","queen","king"];
         this.images = this.loadPiecies(this.piecies);
@@ -32,7 +32,7 @@ class Draw{
                 if(type == 0) types = "white";
                 if(type == 1) types = "black";
                 var piecname = "chess-"+piecies[piece]+"-"+types;
-                imgpics.src = "https://projectsandmore.github.io/ChessGame/gameImages/" + piecname + ".png"
+                imgpics.src = "https://github.com/projectsandmore/ChessGame/tree/master/gameImages/" + piecname + ".png"
                 data.push(imgpics);
             }
         }
